@@ -1,0 +1,81 @@
+### primeiro teste
+
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Dipirona",
+  "cpf": "12345678900"
+}
+### segundo teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Anador",
+  "cpf": "12345678900"
+}
+### terceiro teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Pastilha",
+  "cpf": "12345678900"
+}
+### quarto teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Ritalina",
+  "cpf": "12345678900"
+}
+### quinto teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Tarja preta",
+  "cpf": "12345678900"
+}
+### sexto teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Chumbinho",
+  "cpf": "12345678900"
+}
+### setimo teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Aspirina",
+  "cpf": "12345678900"
+}
+### oitavo teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Tadala",
+  "cpf": "12345678900"
+}
+### nono teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Dorflex",
+  "cpf": "12345678900"
+}
+### decimo teste
+POST http://localhost:8080/pedidos
+Content-Type: application/json
+
+{
+  "produto": "Ozempic",
+  "cpf": "12345678900"
+}
