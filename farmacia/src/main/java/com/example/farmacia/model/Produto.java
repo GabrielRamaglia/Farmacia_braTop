@@ -63,5 +63,8 @@ public class Produto {
 			return tipoProduto;
 		}
 
-}
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
+    }
 
+}

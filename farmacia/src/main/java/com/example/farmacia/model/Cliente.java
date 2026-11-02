@@ -78,6 +78,10 @@ public class Cliente {
         this.isIdoso = isIdoso;
     }
 
+    public void setIdoso(boolean idoso) {
+        this.isIdoso = idoso;
+    }
+
     /**
      * @return boolean return the possuiConvenio
      */
@@ -94,7 +98,15 @@ public class Cliente {
 
     public boolean getisCadastrado(){ 
         return isCadastrado;
-}
+    }
+
+    public boolean isCadastrado() {
+        return isCadastrado;
+    }
+
+    public void setCadastrado(boolean cadastrado) {
+        this.isCadastrado = cadastrado;
+    }
 
   
 }

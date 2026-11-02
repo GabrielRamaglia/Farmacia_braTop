@@ -79,7 +79,7 @@ public class ItemPedido {
     }
 
 		public void setPrecoPraticado(double precoFinalUnitario) {
-			this.precoPraticado = precoPraticado; 
+			this.precoPraticado = precoFinalUnitario;
 		}
 
 }

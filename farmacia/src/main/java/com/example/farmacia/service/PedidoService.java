@@ -4,6 +4,7 @@ import com.example.farmacia.adapter.FornecedorAdapter;
 import com.example.farmacia.model.*;
 import com.example.farmacia.repository.PedidoRepository;
 import com.example.farmacia.repository.ProdutoRepository;
+import com.example.farmacia.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,17 +15,20 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
+    private final ClienteRepository clienteRepository;
     private final SefazService sefaz;
     private final AnsService ans;
     private final FornecedorAdapter fornecedor;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ProdutoRepository produtoRepository,
+                         ClienteRepository clienteRepository,
                          SefazService sefaz,
                          AnsService ans,
                          FornecedorAdapter fornecedor) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = produtoRepository;
+        this.clienteRepository = clienteRepository;
         this.sefaz = sefaz;
         this.ans = ans;
         this.fornecedor = fornecedor;
@@ -35,6 +39,16 @@ public class PedidoService {
         double valorTotalPedido = 0.0;
         boolean contemControlado = false;
         System.out.println("TOTAL DE PRODUTOS NO BANCO: " + produtoRepository.findAll().size());
+
+        if (pedido.getCliente() != null) {
+            Long clienteId = pedido.getCliente().getId();
+            if (clienteId == null) {
+                throw new IllegalArgumentException("Selecione um cliente cadastrado.");
+            }
+            Cliente cliente = clienteRepository.findById(clienteId)
+                    .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
+            pedido.setCliente(cliente);
+        }
 
         // 1. Processar cada item do pedido e aplicar as regras de preço e desconto
         for (ItemPedido item : pedido.getItens()) {
