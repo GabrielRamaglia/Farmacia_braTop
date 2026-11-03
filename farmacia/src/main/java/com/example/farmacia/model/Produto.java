@@ -12,6 +12,7 @@ public class Produto {
     private String nome;
     private double precoBase;
     private TipoProduto tipoProduto; // MEDICAMENTO, HIGIENE, CONTROLADO
+    private int quantidadeEstoque;
 
     // Getters, Setters e Construtores
 
@@ -65,6 +66,14 @@ public class Produto {
 
     public void setTipoProduto(TipoProduto tipoProduto) {
         this.tipoProduto = tipoProduto;
+    }
+
+    public int getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
+
+    public void setQuantidadeEstoque(int quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
     }
 
 }

@@ -84,14 +84,14 @@
           <div class="items-table-wrap">
             <table>
               <thead>
-                <tr><th>PRODUTO</th><th>PREÇO BASE</th><th>QUANTIDADE</th><th></th></tr>
+                <tr><th>PRODUTO</th><th>PREÇO BASE</th><th>EM ESTOQUE</th><th>QUANTIDADE</th><th></th></tr>
               </thead>
               <tbody id="items-body"></tbody>
             </table>
             <div class="empty-state" id="empty-products" hidden>
               <div class="empty-icon">＋</div>
-              <strong>Nenhum produto cadastrado</strong>
-              <p>Cadastre o primeiro produto para começar a registrar vendas.</p>
+              <strong id="empty-products-title">Nenhum produto cadastrado</strong>
+              <p id="empty-products-description">Cadastre o primeiro produto para começar a registrar vendas.</p>
             </div>
           </div>
           <button type="button" class="add-item-button" id="add-item">＋ Adicionar produto</button>
@@ -127,6 +127,7 @@
             <form id="product-form" class="stacked-form">
               <label class="field"><span>Nome do produto</span><input name="nome" required maxlength="120" placeholder="Ex.: Vitamina C"></label>
               <label class="field"><span>Preço base (R$)</span><input name="precoBase" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
+              <label class="field"><span>Quantidade inicial em estoque</span><input name="quantidadeEstoque" required type="number" min="0" step="1" placeholder="Ex.: 20"></label>
               <label class="field">
                 <span>Categoria</span>
                 <select name="tipoProduto" required>
@@ -136,6 +137,15 @@
                 </select>
               </label>
               <button class="secondary-button" type="submit">Salvar produto</button>
+            </form>
+          </details>
+
+          <details class="register-card">
+            <summary><span>＋</span> Repor estoque</summary>
+            <form id="restock-form" class="stacked-form">
+              <label class="field"><span>Produto</span><select name="produtoId" required></select></label>
+              <label class="field"><span>Quantidade a adicionar</span><input name="quantidade" required type="number" min="1" step="1" placeholder="Ex.: 10"></label>
+              <button class="secondary-button" type="submit">Adicionar ao estoque</button>
             </form>
           </details>
 

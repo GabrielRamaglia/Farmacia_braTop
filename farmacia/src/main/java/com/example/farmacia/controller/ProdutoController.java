@@ -5,6 +5,7 @@ import com.example.farmacia.repository.ProdutoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,7 +36,26 @@ public class ProdutoController {
         if (produto.getTipoProduto() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione o tipo do produto.");
         }
+        if (produto.getQuantidadeEstoque() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O estoque inicial não pode ser negativo.");
+        }
         produto.setId(null);
         return repository.save(produto);
+    }
+
+    @PatchMapping("/{id}/estoque")
+    @Transactional
+    public Produto reporEstoque(@PathVariable Long id, @RequestBody ReposicaoEstoque reposicao) {
+        if (reposicao.quantidade() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A quantidade de reposição deve ser maior que zero.");
+        }
+
+        Produto produto = repository.findByIdForUpdate(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado."));
+        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + reposicao.quantidade());
+        return repository.save(produto);
+    }
+
+    public record ReposicaoEstoque(int quantidade) {
     }
 }

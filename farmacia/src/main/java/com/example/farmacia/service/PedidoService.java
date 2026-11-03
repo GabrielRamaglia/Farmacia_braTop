@@ -53,12 +53,22 @@ public class PedidoService {
         // 1. Processar cada item do pedido e aplicar as regras de preço e desconto
         for (ItemPedido item : pedido.getItens()) {
             // Busca o produto completo no banco de dados para garantir os valores e tipos reais
-            Optional<Produto> produtoDb = produtoRepository.findById(item.getProduto().getId());
+            if (item.getQuantidade() <= 0) {
+                throw new IllegalArgumentException("A quantidade do produto deve ser maior que zero.");
+            }
+
+            Optional<Produto> produtoDb = produtoRepository.findByIdForUpdate(item.getProduto().getId());
             if (produtoDb.isEmpty()) {
                 throw new RuntimeException("Produto com ID " + item.getProduto().getId() + " não encontrado.");
             }
             
             Produto produto = produtoDb.get();
+            if (item.getQuantidade() > produto.getQuantidadeEstoque()) {
+                throw new IllegalArgumentException(
+                        "Estoque insuficiente para " + produto.getNome()
+                                + ". Disponível: " + produto.getQuantidadeEstoque() + ".");
+            }
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - item.getQuantidade());
             item.setProduto(produto);
             item.setPedido(pedido);
 

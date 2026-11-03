@@ -42,10 +42,33 @@ async function request(url, options = {}) {
 
 async function loadProducts() {
   products = await request("/produtos");
-  productCount.textContent = products.length;
-  document.querySelector("#empty-products").hidden = products.length > 0;
-  document.querySelector("#add-item").disabled = products.length === 0;
-  if (products.length > 0 && itemsBody.children.length === 0) addItemRow();
+  const availableProducts = products.filter((product) => product.quantidadeEstoque > 0);
+  productCount.textContent = availableProducts.length;
+  document.querySelector("#empty-products").hidden = availableProducts.length > 0;
+  document.querySelector("#empty-products-title").textContent = products.length > 0
+    ? "Sem produtos em estoque"
+    : "Nenhum produto cadastrado";
+  document.querySelector("#empty-products-description").textContent = products.length > 0
+    ? "Reponha o estoque de um produto para registrar uma venda."
+    : "Cadastre o primeiro produto para começar a registrar vendas.";
+  document.querySelector("#add-item").disabled = availableProducts.length === 0;
+  itemsBody.querySelectorAll("tr").forEach((row) => {
+    const select = row.querySelector("select");
+    const selectedProductId = select.value;
+    select.replaceChildren(new Option("Selecione um produto", ""));
+    availableProducts.forEach((product) => {
+      select.add(new Option(`${product.nome} (${product.tipoProduto})`, product.id));
+    });
+    select.value = selectedProductId;
+    select.dispatchEvent(new Event("change"));
+  });
+  if (availableProducts.length > 0 && itemsBody.children.length === 0) addItemRow();
+
+  const restockSelect = document.querySelector('#restock-form select[name="produtoId"]');
+  restockSelect.replaceChildren(new Option("Selecione um produto", ""));
+  products.forEach((product) => {
+    restockSelect.add(new Option(`${product.nome} — estoque: ${product.quantidadeEstoque}`, product.id));
+  });
 }
 
 async function loadCustomers() {
@@ -65,13 +88,17 @@ function addItemRow() {
   productSelect.required = true;
   productSelect.setAttribute("aria-label", "Produto");
   productSelect.add(new Option("Selecione um produto", ""));
-  products.forEach((product) => {
+  products.filter((product) => product.quantidadeEstoque > 0).forEach((product) => {
     productSelect.add(new Option(`${product.nome} (${product.tipoProduto})`, product.id));
   });
 
   const priceCell = document.createElement("td");
   priceCell.className = "price-cell";
   priceCell.textContent = "—";
+
+  const stockCell = document.createElement("td");
+  stockCell.className = "price-cell";
+  stockCell.textContent = "—";
 
   const quantityCell = document.createElement("td");
   const quantityInput = document.createElement("input");
@@ -100,12 +127,15 @@ function addItemRow() {
     priceCell.textContent = product
       ? Number(product.precoBase).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
       : "—";
+    stockCell.textContent = product ? product.quantidadeEstoque : "—";
+    quantityInput.max = product ? product.quantidadeEstoque : "";
+    quantityInput.value = "1";
     updateSummary();
   });
   quantityInput.addEventListener("input", updateSummary);
 
   productCell.append(productSelect);
-  row.append(productCell, priceCell, quantityCell, removeCell);
+  row.append(productCell, priceCell, stockCell, quantityCell, removeCell);
   itemsBody.append(row);
   updateSummary();
 }
@@ -171,7 +201,11 @@ document.querySelector("#submit-sale").addEventListener("click", async (event) =
     customerSelect.value = "";
     updateCustomerSummary();
     updateSummary();
-    addItemRow();
+    try {
+      await loadProducts();
+    } catch (refreshError) {
+      showNotice(`Venda registrada, mas não foi possível atualizar o estoque exibido: ${refreshError.message}`, "error");
+    }
   } catch (error) {
     showNotice(error.message, "error");
   } finally {
@@ -191,7 +225,7 @@ document.querySelector("#product-form").addEventListener("submit", async (event)
     await request("/produtos", { method: "POST", body: JSON.stringify(data) });
     form.reset();
     await loadProducts();
-    showNotice("Produto cadastrado. Ele já está disponível para venda.", "success");
+    showNotice("Produto cadastrado. Se o estoque inicial for zero, use “Repor estoque” antes de vendê-lo.", "success");
   } catch (error) {
     showNotice(error.message, "error");
   } finally {
@@ -217,6 +251,29 @@ document.querySelector("#customer-form").addEventListener("submit", async (event
     form.reset();
     await loadCustomers();
     showNotice("Cliente cadastrado e disponível para selecionar no pedido.", "success");
+  } catch (error) {
+    showNotice(error.message, "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.querySelector("#restock-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector("button");
+  button.disabled = true;
+  try {
+    const formData = new FormData(form);
+    const productId = formData.get("produtoId");
+    const quantity = Number(formData.get("quantidade"));
+    await request(`/produtos/${productId}/estoque`, {
+      method: "PATCH",
+      body: JSON.stringify({ quantidade: quantity })
+    });
+    form.reset();
+    await loadProducts();
+    showNotice("Estoque atualizado com sucesso.", "success");
   } catch (error) {
     showNotice(error.message, "error");
   } finally {
