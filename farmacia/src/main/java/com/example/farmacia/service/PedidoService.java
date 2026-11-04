@@ -120,7 +120,7 @@ public class PedidoService {
         sefaz.enviarNotaFiscal(notaFiscal);
 
         if (contemControlado) {
-            ans.enviarReceita("Notificação de Receita Retida - Pedido ID: " + pedidoSalvo.getId() + " | Cliente CPF: " + pedidoSalvo.getCliente().getCpf());
+            ans.enviarReceita("Notificação de Receita Retida - Pedido ID: " + pedidoSalvo.getId() + " | Cliente cpf: " + pedidoSalvo.getCliente().getCpf());
         }
 
         // Envia o primeiro produto para a API de fornecedores como exemplo de comunicação síncrona (Versão 1)
